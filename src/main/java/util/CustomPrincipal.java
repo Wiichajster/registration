@@ -8,8 +8,9 @@ public class CustomPrincipal extends SimplePrincipal {
 
 	private boolean isActivated;
 
-	public CustomPrincipal(String name) {
+	public CustomPrincipal(String name, boolean isActivated) {
 		super(name);
+		this.isActivated = isActivated;
 	}
 
 	public boolean isActivated() {

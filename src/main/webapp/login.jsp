@@ -22,6 +22,6 @@
 		<br>
 		<input type="submit" value="Zaloguj"/>
 	</form>
-	Nie masz jeszcze konta? <a href="${pageContext.request.contextPath}/register">Zaloguj się</a>
+	Nie masz jeszcze konta? <a href="${pageContext.request.contextPath}/register">Zarejestruj się</a>
 </body>
 </html>

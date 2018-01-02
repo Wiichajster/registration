@@ -54,31 +54,36 @@ public class LoginServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
-
-		CustomPrincipal principal = (CustomPrincipal) request.getUserPrincipal();
-
-		
-		System.out.println("LoginServlet: Nazwa użytkownika: " + principal.getName());
-
-		/*User user = repo.get(username);
-
-		boolean isValidated = false;
 		try {
-			isValidated = AuthHelper.validate(user, password);
-		} catch (NoSuchAlgorithmException e) {
-			request.setAttribute("errorMessage", "Wystąpił błąd w czasie logowania");
-		}
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
 
-		if (isValidated) {
-			System.out.println("Login servlet: isValidated");
-			HttpSession session = request.getSession(true);
-			session.setAttribute("user", user);
+			if (username != null && password != null) {
+				request.login(username, password);
+			}
+
+			CustomPrincipal principal = (CustomPrincipal) request.getUserPrincipal();
+
+			System.out.println("LoginServlet: Nazwa użytkownika: " + principal.getName());
+			System.out.println("LoginServlet: Czy aktywny: " + principal.isActivated());
+
 			response.sendRedirect(request.getContextPath() + "/");
-		} else {
-			request.setAttribute("errorMessage", "Niepoprawny login lub hasło");
-		}*/
+
+		} catch (ServletException ex) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		}
+		/*
+		 * User user = repo.get(username);
+		 * 
+		 * boolean isValidated = false; try { isValidated = AuthHelper.validate(user,
+		 * password); } catch (NoSuchAlgorithmException e) {
+		 * request.setAttribute("errorMessage", "Wystąpił błąd w czasie logowania"); }
+		 * 
+		 * if (isValidated) { System.out.println("Login servlet: isValidated");
+		 * HttpSession session = request.getSession(true); session.setAttribute("user",
+		 * user); response.sendRedirect(request.getContextPath() + "/"); } else {
+		 * request.setAttribute("errorMessage", "Niepoprawny login lub hasło"); }
+		 */
 
 	}
 }

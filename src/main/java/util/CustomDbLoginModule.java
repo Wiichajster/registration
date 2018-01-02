@@ -14,8 +14,8 @@ public class CustomDbLoginModule extends DatabaseServerLoginModule {
 	public boolean login() throws LoginException {
 		boolean result = super.login();
 		if (result) {
-			principal = new CustomPrincipal(getUsername());
-			result = true;
+			principal = new CustomPrincipal(getUsername(), false);
+			//result = true;
 		}
 
 		return result;
@@ -28,6 +28,6 @@ public class CustomDbLoginModule extends DatabaseServerLoginModule {
 
 	@Override
 	protected Principal getIdentity() {
-		return principal != null ? this.principal : null;
+		return principal != null ? this.principal : super.getIdentity();
 	}
 }

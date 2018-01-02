@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import ejb.LoginRepository;
 import model.User;
+import util.CustomPrincipal;
 
 //@WebFilter("/*")
 public class LoginFilter implements Filter {
@@ -33,19 +34,17 @@ public class LoginFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse resp = (HttpServletResponse) response;
-		HttpSession session = req.getSession();
-		User user = (User) session.getAttribute("user");
-		System.out.println("Login filter: przed ifem");
-		if (user == null) {
-			System.out.println("Login filter: za ifem");
-			//resp.sendRedirect(req.getContextPath() + "/login");
-			/*
-			 * if (user.isActive()) { req.getSession(true).setAttribute("user", user); }else
-			 * { req.getRequestDispatcher("activate.jsp").forward(req,
-			 * (HttpServletResponse)response); }
-			 */
+		
+		CustomPrincipal principal = (CustomPrincipal)req.getUserPrincipal();
+		
+		if(principal!=null) {
+			if(!principal.isActivated()) {
+				System.out.println("LoginFilter: Użytkownik nieaktywny");
+			}else {
+				System.out.println("LoginFilter: Użytkownik aktywny");
+			}
 		}
+		
 
 		chain.doFilter(request, response);
 
