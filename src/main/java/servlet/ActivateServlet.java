@@ -35,11 +35,11 @@ public class ActivateServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("Activate servlet: doGet()");
 		String hash = request.getParameter("hash");
 		if (hash != null) {
 			repo.activateUser(hash);
-			response.sendRedirect(request.getContextPath() + "/");
+
+			response.sendRedirect(request.getContextPath() + "/");			
 		} else {
 			request.setAttribute("errorMessage", "Nieprawidłowy adres aktywacyjny. Proszę spróbować jeszcze raz.");
 			request.getRequestDispatcher("login.jsp").forward(request, response);

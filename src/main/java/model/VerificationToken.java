@@ -19,6 +19,8 @@ import util.HashingHelper;
  * Token weryfikacyjny. Klasa służąca do aktywacji użytkownika. Po jego rejestracji pole isActive użytkownika
  * jest ustawione na false. To uniemożliwa korzystanie z serwisu. Aby aktywować konto trzeba kliknąć na link
  * werfikacyjny przesłany w mailu. Dopiero po tym konto jest aktywowane i można w pełni z niego korzystać.
+ * 
+ * @author Damian Dalecki
  */
 
 @Entity
