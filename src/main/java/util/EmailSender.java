@@ -22,10 +22,10 @@ public class EmailSender implements MessageSender {
 	@Override
 	public boolean sendHtmlEmail(String recipient, String title, String message) throws MessagingException {
 
-		Properties props = new Properties(); //loadPropertiesFromFile(PROPERTIES_FILE);
+		Properties props = loadPropertiesFromFile(PROPERTIES_FILE);
 
-		String username = "ddalecki88@gmail.com";//props.getProperty("username");
-		String password = "!!Dam1988!!";//props.getProperty("password");
+		String username = props.getProperty("username");
+		String password = props.getProperty("password");
 		boolean result = false;
 
 		props.put("mail.smtp.auth", "true");

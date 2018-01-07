@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import ejb.RegistrationReository;
+import ejb.RegistrationRepository;
 import exceptions.UserAlreadyExistException;
 import model.User;
 import util.HashingHelper;
@@ -27,7 +27,7 @@ public class RegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private RegistrationReository repo;
+	private RegistrationRepository repo;
 
 	public RegistrationServlet() {
 		super();

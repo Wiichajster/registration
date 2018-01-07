@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import ejb.AccountRepository;
-import ejb.RegistrationReository;
+import ejb.RegistrationRepository;
 import exceptions.UserAlreadyExistException;
 import model.User;
 
@@ -32,7 +32,7 @@ public class LoginEndpoint {
 	@Inject
 	private AccountRepository repo;
 
-	private RegistrationReository rRepo;
+	private RegistrationRepository rRepo;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

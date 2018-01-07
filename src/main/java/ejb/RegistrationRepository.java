@@ -7,7 +7,7 @@ import exceptions.UserAlreadyExistException;
 import model.User;
 import model.VerificationToken;
 
-public interface RegistrationReository {
+public interface RegistrationRepository {
 	public boolean add(User user) throws ConstraintViolationException, MessagingException, UserAlreadyExistException;
 
 	public boolean sendActivationEmail(VerificationToken token) throws MessagingException;

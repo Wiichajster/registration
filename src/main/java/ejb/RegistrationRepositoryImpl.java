@@ -26,7 +26,7 @@ import util.MessageSender;
  */
 
 @Stateless
-public class RegistrationReositoryImpl implements RegistrationReository {
+public class RegistrationRepositoryImpl implements RegistrationRepository {
 
 	// pola prywatne
 
@@ -63,7 +63,7 @@ public class RegistrationReositoryImpl implements RegistrationReository {
 		token.setUser(user);
 		token.setTokenHash();
 		try {
-			validator.validate(user);
+			getValidator().validate(user);
 			em.persist(user);
 			em.persist(token);
 
@@ -97,7 +97,7 @@ public class RegistrationReositoryImpl implements RegistrationReository {
 		String message = createActivationMessage(token);
 
 		try {
-			messageSender.sendHtmlEmail(recipient, subject, message);
+			getMessageSender().sendHtmlEmail(recipient, subject, message);
 			result = true;
 		} catch (MessagingException ex) {
 			throw ex;
@@ -142,6 +142,32 @@ public class RegistrationReositoryImpl implements RegistrationReository {
 		builder.append("<p>Jeżeli to nie ty zakładałeś to konto to zignoruj tą wiadomość</p>");
 
 		return builder.toString();
+	}
+	
+	//gettery i settery
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
+	}
+
+	public MessageSender getMessageSender() {
+		return messageSender;
+	}
+
+	public void setMessageSender(MessageSender messageSender) {
+		this.messageSender = messageSender;
+	}
+
+	public Validator getValidator() {
+		return validator;
+	}
+
+	public void setValidator(Validator validator) {
+		this.validator = validator;
 	}
 
 }
