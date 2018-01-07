@@ -1,1 +1,7 @@
 /target/
+
+mail.properties
+
+.settings/
+.classpath
+.project																																						
