@@ -1,7 +1,6 @@
 package model;
 
 import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -44,10 +43,9 @@ public class VerificationToken implements Serializable {
 	private LocalDateTime expirationDateTime;
 	private String tokenHash;
 
-	public VerificationToken() throws NoSuchAlgorithmException {
+	public VerificationToken() {
 		registrationDateTime = LocalDateTime.now();
 		expirationDateTime = registrationDateTime.plusDays(1);
-		// setTokenHash();
 	}
 
 	public Long getId() {
@@ -86,7 +84,7 @@ public class VerificationToken implements Serializable {
 		return tokenHash;
 	}
 
-	public void setTokenHash() throws NoSuchAlgorithmException {
+	public void setTokenHash() {
 		this.tokenHash = HashingHelper.hashString(user.getUsername());
 	}
 }

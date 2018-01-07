@@ -12,23 +12,19 @@ import javax.servlet.http.HttpSession;
 import model.User;
 
 /**
- * Servlet implementation class LoginServlet
+ * Servlet obsługujący żądania modułu logowania użytkownika
  */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public LoginServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Metoda obsługująca żądania GET. Jeżeli użytkownik jest już zapisany jako
+	 * atrybut sesji przekierowuje do strony głównej
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -44,6 +40,10 @@ public class LoginServlet extends HttpServlet {
 
 	}
 
+	/*
+	 * Metoda obsługująca żądania POST, przetwarzająca dane wysłane w formularzu
+	 * logowania.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {

@@ -9,33 +9,29 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ejb.ActivateRepository;
+import ejb.AccountRepository;
 
 /**
- * Servlet implementation class ActivateServlet
+ * Servlet obsługujący żądania do aktywacji konta użytkownika
  */
 @WebServlet("/activate")
 public class ActivateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private ActivateRepository repo;
+	private AccountRepository repo;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public ActivateServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Metoda obsługująca żadanie wysyłane przez link aktywacyjny.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String hash = request.getParameter("hash");
+		
 		if (hash != null) {
 			repo.activateUser(hash);
 
@@ -44,7 +40,6 @@ public class ActivateServlet extends HttpServlet {
 			request.setAttribute("errorMessage", "Nieprawidłowy adres aktywacyjny. Proszę spróbować jeszcze raz.");
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
-		
 	}
 
 }

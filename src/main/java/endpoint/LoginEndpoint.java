@@ -2,11 +2,12 @@ package endpoint;
 
 import java.io.IOException;
 
-import javax.ejb.EJBException;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -18,7 +19,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import ejb.LoginRepository;
+import ejb.AccountRepository;
+import ejb.RegistrationReository;
 import exceptions.UserAlreadyExistException;
 import model.User;
 
@@ -28,7 +30,9 @@ import model.User;
 public class LoginEndpoint {
 
 	@Inject
-	private LoginRepository repo;
+	private AccountRepository repo;
+
+	private RegistrationReository rRepo;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -44,9 +48,10 @@ public class LoginEndpoint {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createUser(User user) throws EJBException, UserAlreadyExistException {
+	public Response createUser(User user)
+			throws ConstraintViolationException, MessagingException, UserAlreadyExistException {
 		if (user != null) {
-			repo.add(user);
+			rRepo.add(user);
 			return Response.ok().build();
 		} else {
 			return Response.status(Status.BAD_REQUEST).build();
@@ -57,9 +62,9 @@ public class LoginEndpoint {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void createUser(@FormParam("username") String username, @FormParam("password") String password,
 			@FormParam("email") String email, @Context HttpServletRequest request,
-			@Context HttpServletResponse response) throws UserAlreadyExistException, IOException {
+			@Context HttpServletResponse response) throws MessagingException, UserAlreadyExistException, IOException {
 		User user = new User(username, password, email);
-		repo.add(user);
+		rRepo.add(user);
 		response.sendRedirect(request.getContextPath() + "/");
 
 	}

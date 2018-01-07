@@ -14,18 +14,18 @@ import java.security.NoSuchAlgorithmException;
 
 public class HashingHelper {
 
-	public static String hashString(String password) throws NoSuchAlgorithmException {
+	public static String hashString(String text) {
 		String result = null;
 
-		if (password == null) {
+		if (text == null) {
 			return null;
 		}
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(password.getBytes());
+			md.update(text.getBytes());
 			result = new BigInteger(1, md.digest()).toString(16);
 		} catch (NoSuchAlgorithmException ex) {
-			throw new NoSuchAlgorithmException("Błąd podczas kodowania hasła", ex);
+			ex.printStackTrace();
 		}
 		return result;
 	}

@@ -10,8 +10,10 @@
 <body>
 	<h1>Rejestracja</h1>
 	<br>
-	<c:if test="${not empty errorMessage}">
-		<c:out value="${errorMessage}"/>
+	<c:if test="${not empty errorMessages}">
+		<c:forEach items="${errorMessages}" var="errors">
+			<c:out value="${errors}"/>
+		</c:forEach>
 	</c:if>
 	<form action="register" method="post">
 		<label for="username">Login: </label> 

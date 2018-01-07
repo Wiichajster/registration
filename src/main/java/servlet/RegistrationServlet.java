@@ -1,42 +1,40 @@
 package servlet;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.ejb.EJBException;
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
-import ejb.LoginRepository;
+import ejb.RegistrationReository;
 import exceptions.UserAlreadyExistException;
 import model.User;
 import util.HashingHelper;
 
 /**
- * Servlet implementation class RegistrationServlet
+ * Servlet obsługujący zadania rejestracji użytkownika
  */
 @WebServlet("/register")
 public class RegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private LoginRepository repo;
+	private RegistrationReository repo;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public RegistrationServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * W przypadku rządania GET przekieruj do pustego formularza rejestracyjnego
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -44,37 +42,46 @@ public class RegistrationServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Metoda przetwarzająca dane wysłanego formularza oraz wywołująca logikę
+	 * dodania użytkownika do bazy danych
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String email = request.getParameter("email");
+		Set<String> errorMessages = new HashSet<>();
 
 		if (password != null) {
-			try {
-				password = HashingHelper.hashString(password);
-			} catch (NoSuchAlgorithmException ex) {
-				request.setAttribute("errorMessage", "Wystąpił nieoczekiwany błąd podczas rejestracji");
-				request.getRequestDispatcher("registration.jsp").forward(request, response);
-			}
+			password = HashingHelper.hashString(password);
 		}
 
 		User user = new User(username, password, email);
 
 		try {
-			repo.add(user);
-		} catch (UserAlreadyExistException ex) {
-			request.setAttribute("errorMessage", "Nazwa użytkownika jest już zajęta");
+			if(repo.add(user)) {
+				response.sendRedirect(request.getContextPath() + "/");
+			}
+		} catch (ConstraintViolationException ex) {
+			System.out.println("Registration servlet: Constraint violation");
+			Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+			for(ConstraintViolation<?> v: violations) {
+				errorMessages.add(v.getMessage());
+			}
+			
+			request.setAttribute("errorMessages", errorMessages);
 			request.getRequestDispatcher("registration.jsp").forward(request, response);
-		} catch (EJBException ex) {
-			request.setAttribute("errorMessage", "Wystąpił nieoczekiwany błąd podczas rejestracji");
+		} catch (UserAlreadyExistException ex) {
+			errorMessages.add("Nazwa użytkownika jest już zajęta");
+			
+			request.setAttribute("errorMessages", errorMessages);
+			request.getRequestDispatcher("registration.jsp").forward(request, response);
+		} catch (MessagingException ex) {
+			errorMessages.add("Wystąpił nieoczekiwany błąd podczas wysyłania wiadomości aktywacyjnej");
+			
+			request.setAttribute("errorMessages", errorMessages);
 			request.getRequestDispatcher("registration.jsp").forward(request, response);
 		}
-
-		response.sendRedirect(request.getContextPath() + "/");
 	}
 
 }

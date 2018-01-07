@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import ejb.ActivateRepository;
+import ejb.AccountRepository;
 
 @RequestScoped
 @Path("/activate")
@@ -17,7 +17,7 @@ import ejb.ActivateRepository;
 public class ActivationEndpoint {
 
 	@Inject
-	private ActivateRepository repo;
+	private AccountRepository repo;
 
 	@GET
 	@Path("/{hash}")

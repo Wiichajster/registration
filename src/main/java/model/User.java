@@ -10,17 +10,29 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
 
 @Entity
 @Table(name = "users")
+@NamedQueries({ @NamedQuery(name = "User.FindByMail", query = "SELECT u FROM User u WHERE u.email = :email") })
 public class User implements Serializable {
 
 	private static final long serialVersionUID = -7351729135012380019L;
 
 	@Id
+	@NotNull
+	@Size(min = 4, max = 20)
 	private String username;
+	@NotNull
+	@Size(min = 5, max = 60)
 	private String password;
+	@Email
 	private String email;
 	private boolean isActive;
 
