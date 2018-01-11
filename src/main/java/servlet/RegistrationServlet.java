@@ -1,9 +1,11 @@
 package servlet;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -12,10 +14,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+
+import org.apache.log4j.Logger;
 
 import ejb.RegistrationRepository;
-import exceptions.UserAlreadyExistException;
 import model.User;
 import util.HashingHelper;
 
@@ -25,9 +28,13 @@ import util.HashingHelper;
 @WebServlet("/register")
 public class RegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static Logger LOG = Logger.getLogger(RegistrationServlet.class);
 
 	@Inject
 	private RegistrationRepository repo;
+
+	@Resource
+	private Validator validator;
 
 	public RegistrationServlet() {
 		super();
@@ -49,8 +56,7 @@ public class RegistrationServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		String email = request.getParameter("email");
-		Set<String> errorMessages = new HashSet<>();
+		String email = request.getParameter("email");		
 
 		if (password != null) {
 			password = HashingHelper.hashString(password);
@@ -58,30 +64,34 @@ public class RegistrationServlet extends HttpServlet {
 
 		User user = new User(username, password, email);
 
-		try {
-			if(repo.add(user)) {
-				response.sendRedirect(request.getContextPath() + "/");
+		List<String> errorMessages = validateForm(user);
+		
+		if (errorMessages.isEmpty()) {
+			try {
+				repo.add(user);
+			} catch (MessagingException e) {
+				LOG.error("Błąd wysyłania aktywacyjnej wiadomości email");
+				errorMessages.add("Błąd w trakcie wysyłania wiadomości aktywacyjnej. Proszę spróbować ponownie");
 			}
-		} catch (ConstraintViolationException ex) {
-			System.out.println("Registration servlet: Constraint violation");
-			Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
-			for(ConstraintViolation<?> v: violations) {
-				errorMessages.add(v.getMessage());
-			}
-			
+		} else {
 			request.setAttribute("errorMessages", errorMessages);
 			request.getRequestDispatcher("registration.jsp").forward(request, response);
-		} catch (UserAlreadyExistException ex) {
-			errorMessages.add("Nazwa użytkownika jest już zajęta");
-			
-			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("registration.jsp").forward(request, response);
-		} catch (MessagingException ex) {
-			errorMessages.add("Wystąpił nieoczekiwany błąd podczas wysyłania wiadomości aktywacyjnej");
-			
-			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("registration.jsp").forward(request, response);
+		} 
+
+		response.sendRedirect(request.getContextPath() + "/");
+	}
+	
+	private List<String> validateForm(User user){
+		Set<ConstraintViolation<User>> errors = null;
+		List<String> errorMessages = new ArrayList<>();
+		
+		errors = validator.validate(user);
+		
+		for (ConstraintViolation<User> c : errors) {
+			errorMessages.add(c.getMessage());
 		}
+		
+		 return errorMessages;
 	}
 
 }

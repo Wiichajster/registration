@@ -18,6 +18,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 
+import validators.UserExist;
+
 @Entity
 @Table(name = "users")
 @NamedQueries({ @NamedQuery(name = "User.FindByMail", query = "SELECT u FROM User u WHERE u.email = :email") })
@@ -28,6 +30,7 @@ public class User implements Serializable {
 	@Id
 	@NotNull
 	@Size(min = 4, max = 20)
+	@UserExist
 	private String username;
 	@NotNull
 	@Size(min = 5, max = 60)

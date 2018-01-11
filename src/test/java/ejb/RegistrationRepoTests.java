@@ -1,7 +1,8 @@
 package ejb;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
@@ -30,27 +31,37 @@ public class RegistrationRepoTests {
 
 		assertFalse(result);
 	}
-
-	@Test(expected=UserAlreadyExistException.class)
-	public void inAddIfUserExistThrowException() throws ConstraintViolationException, MessagingException, UserAlreadyExistException {
-		
-		User user = new User("test", "test", "test@test.com");
-		EntityManager em = repo.getEm();
-		
-		when(em.find(User.class, user.getUsername())).thenReturn(user);
 	
-		repo.add(user);
+	@Test
+	public void ifUserExistThenTrue() {
+		EntityManager em = repo.getEm();
+		User user = new User("test","test","test@test.pl");
+		
+		when(em.find(User.class, "test")).thenReturn(user);
+		
+		boolean result = repo.checkLoginUsage("test");
+		
+		assertTrue(result);
 	}
 	
-	@Test(expected=UserAlreadyExistException.class)
-	public void ifAddThenPersistUser() throws ConstraintViolationException, MessagingException, UserAlreadyExistException {
-		
-		User user = new User("test", "test", "test@test.com");
+	@Test
+	public void ifUserDontExistThenTrue() {
 		EntityManager em = repo.getEm();
 		
-		//doAnswer()
-		//TODO
+		when(em.find(User.class, "test")).thenReturn(null);
+		
+		boolean result = repo.checkLoginUsage("test");
+		
+		assertFalse(result);
+	}
 	
-		repo.add(user);
+	@Test(expected=IllegalArgumentException.class)
+	public void ifUserIsNullThenException() {
+		repo.checkLoginUsage(null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void ifUserIsEmptyStringThenException() {
+		repo.checkLoginUsage(null);
 	}
 }

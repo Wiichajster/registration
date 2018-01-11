@@ -1,18 +1,13 @@
 package ejb;
 
-import java.util.Set;
-
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import exceptions.UserAlreadyExistException;
 import model.User;
 import model.VerificationToken;
 import util.MessageSender;
@@ -35,7 +30,7 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 
 	@Inject
 	private MessageSender messageSender;
-	
+
 	@Resource
 	private Validator validator;
 
@@ -46,7 +41,7 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 	 * rejestracji konto użytkonika jest nieaktywne. Tworzony jest powiązany z nim
 	 * VerificationToken, czyli dodatkowy obiekt pomocniczy do aktywacji konta
 	 */
-	public boolean add(User user) throws ConstraintViolationException, MessagingException, UserAlreadyExistException {
+	public boolean add(User user) throws MessagingException {
 		if (user == null) {
 			return false;
 		}
@@ -54,32 +49,21 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 		boolean result = false;
 		VerificationToken token = new VerificationToken();
 
-		// jeżeli nazwa zajęta wyrzuć wyjątek
-		if (checkLoginUsage(user.getUsername())) {
-			throw new UserAlreadyExistException("Nazwa jest już zajęta");
-		}
+		/*
+		 * // jeżeli nazwa zajęta wyrzuć wyjątek if
+		 * (checkLoginUsage(user.getUsername())) { throw new
+		 * UserAlreadyExistException("Nazwa jest już zajęta"); }
+		 */
 
 		user.getRoles().add("user");
 		token.setUser(user);
 		token.setTokenHash();
-		try {
-			getValidator().validate(user);
-			em.persist(user);
-			em.persist(token);
+		getValidator().validate(user);
+		em.persist(user);
+		em.persist(token);
 
-			sendActivationEmail(token);
+		if (sendActivationEmail(token))
 			result = true;
-		} catch (ConstraintViolationException ex) {
-			System.out.println("RegistrationRepository: Constraint violation");
-			Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
-			for(ConstraintViolation<?> v: violations) {
-				System.out.println(v.getMessage());
-			}
-			
-			//throw new ConstraintViolationException(ex.getConstraintViolations());
-		} catch (MessagingException ex) {
-			throw ex;
-		}
 
 		return result;
 	}
@@ -106,16 +90,17 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 		return result;
 	}
 
-	// metody prywatne
-
 	/*
 	 * Metoda do sprawdzenia czy w bazie danych istnieje już użytkownik o podanej
 	 * nazwie
 	 */
 
-	private boolean checkLoginUsage(String username) {
+	public boolean checkLoginUsage(String username) throws IllegalArgumentException {
 		boolean result = false;
 
+		if (username == null || "".equals(username)) {
+			throw new IllegalArgumentException();
+		}
 		User user = em.find(User.class, username);
 
 		if (user != null) {
@@ -124,6 +109,8 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 
 		return result;
 	}
+
+	// metody prywatne
 
 	/*
 	 * Metoda tworząca na podstawie dostarczonego obiektu VerificationToken
@@ -143,8 +130,8 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
 
 		return builder.toString();
 	}
-	
-	//gettery i settery
+
+	// gettery i settery
 
 	public EntityManager getEm() {
 		return em;

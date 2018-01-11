@@ -1,14 +1,14 @@
 package ejb;
 
 import javax.mail.MessagingException;
-import javax.validation.ConstraintViolationException;
 
-import exceptions.UserAlreadyExistException;
 import model.User;
 import model.VerificationToken;
 
 public interface RegistrationRepository {
-	public boolean add(User user) throws ConstraintViolationException, MessagingException, UserAlreadyExistException;
+	public boolean add(User user) throws MessagingException;
 
 	public boolean sendActivationEmail(VerificationToken token) throws MessagingException;
+	
+	public boolean checkLoginUsage(String username) throws IllegalArgumentException;
 }

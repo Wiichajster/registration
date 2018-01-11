@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response.Status;
 
 import ejb.AccountRepository;
 import ejb.RegistrationRepository;
-import exceptions.UserAlreadyExistException;
 import model.User;
 
 @RequestScoped
@@ -48,8 +47,7 @@ public class LoginEndpoint {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createUser(User user)
-			throws ConstraintViolationException, MessagingException, UserAlreadyExistException {
+	public Response createUser(User user) throws ConstraintViolationException, MessagingException {
 		if (user != null) {
 			rRepo.add(user);
 			return Response.ok().build();
@@ -62,7 +60,7 @@ public class LoginEndpoint {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void createUser(@FormParam("username") String username, @FormParam("password") String password,
 			@FormParam("email") String email, @Context HttpServletRequest request,
-			@Context HttpServletResponse response) throws MessagingException, UserAlreadyExistException, IOException {
+			@Context HttpServletResponse response) throws MessagingException, IOException {
 		User user = new User(username, password, email);
 		rRepo.add(user);
 		response.sendRedirect(request.getContextPath() + "/");
